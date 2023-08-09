@@ -24,7 +24,12 @@ class Main:
 
         #ground
         ground = pygame.image.load('assets/sprites/base.png').convert()
+
         self.ground = pygame.transform.smoothscale(ground, (WIDTH,ground.get_height()))
+        self.ground_rect = self.ground.get_rect(topleft=(0, GROUND_POSITION_Y))
+        self.ground_repeat = pygame.transform.smoothscale(ground, (WIDTH, ground.get_height()))
+        self.ground_repeat_rect = self.ground_repeat.get_rect(topleft=(-WIDTH, GROUND_POSITION_Y))
+
         # title of game
         pygame.display.set_caption("Flappy Bird")
         # icon for game
@@ -38,13 +43,12 @@ class Main:
 
         # obstacles
         self.obstacles = pygame.sprite.Group()
-        bottom_center_position = randint(500, HEIGHT)
-        self.obstacles.add(Pipe('bottom',bottom_center_position ))
-        top_center_position = bottom_center_position - 800
-        self.obstacles.add(Pipe('top', top_center_position))
-
 
         self.clock = pygame.time.Clock()
+
+        # timer for obstacle
+        self.obstacle_timer = pygame.USEREVENT + 1
+        pygame.time.set_timer(self.obstacle_timer, 2500)
 
     def run(self):
         """
@@ -52,20 +56,45 @@ class Main:
         """
         while(True):
 
+            # set the background
+            self.screen.blit(self.background, (0, 0))
+
+
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
 
-            # set the background
-            self.screen.blit(self.background,(0,0))
+                # spawn obstacle
+                if event.type == self.obstacle_timer:
+                    bottom_center_position = randint(500, HEIGHT)
+                    self.obstacles.add(Pipe('bottom', bottom_center_position))
+                    top_center_position = bottom_center_position - 800
+                    self.obstacles.add(Pipe('top', top_center_position))
 
+
+
+
+            self.obstacles.draw(self.screen)
+            self.obstacles.update()
+
+            # checking if the ground went out of screen and re-rendering based on it
+            if self.ground_rect.right<2:
+                self.ground_rect.left = WIDTH
+            if self.ground_repeat_rect.right <2:
+                self.ground_repeat_rect.left = WIDTH
             # set the ground
-            self.screen.blit(self.ground,(0,GROUND_POSITION_Y))
+            self.screen.blit(self.ground, self.ground_rect)
+            self.screen.blit(self.ground_repeat, self.ground_repeat_rect)
+
+            self.ground_rect.x -= 2
+            self.ground_repeat_rect.x -= 2
+
+
+
             # display the player/bird
             self.player.draw(self.screen)
             self.player.update()
-
-            self.obstacles.draw(self.screen)
 
             #update the screen
             pygame.display.update()

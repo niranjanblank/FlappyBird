@@ -59,12 +59,19 @@ class Pipe(pygame.sprite.Sprite):
 
         if type=='bottom':
             self.image = pygame.transform.rotozoom(pipe,0, 2)
-            self.rect = self.image.get_rect(center=(300, height))
+            self.rect = self.image.get_rect(center=(WIDTH+100, height))
         else:
             self.image = pygame.transform.rotozoom(pipe, 180, 2)
             self.image = pygame.transform.flip(self.image, True, False)
-            self.rect = self.image.get_rect(center=(300, height))
+            self.rect = self.image.get_rect(center=(WIDTH+100, height))
 
+    def destroy(self):
+        if self.rect.x <= -100:
+            self.kill()
+
+    def update(self):
+        self.rect.x -= 2
+        self.destroy()
 
 
 
