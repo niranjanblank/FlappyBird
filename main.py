@@ -2,6 +2,8 @@ import pygame.display
 from sys import exit
 from settings import *
 from game import *
+from random import randint
+
 class Main:
     """
     This class will be used to run the event loop
@@ -34,6 +36,13 @@ class Main:
         self.player = pygame.sprite.GroupSingle()
         self.player.add(Bird())
 
+        # obstacles
+        self.obstacles = pygame.sprite.Group()
+        bottom_center_position = randint(500, HEIGHT)
+        self.obstacles.add(Pipe('bottom',bottom_center_position ))
+        top_center_position = bottom_center_position - 800
+        self.obstacles.add(Pipe('top', top_center_position))
+
 
         self.clock = pygame.time.Clock()
 
@@ -55,6 +64,8 @@ class Main:
             # display the player/bird
             self.player.draw(self.screen)
             self.player.update()
+
+            self.obstacles.draw(self.screen)
 
             #update the screen
             pygame.display.update()

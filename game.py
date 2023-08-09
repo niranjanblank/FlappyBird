@@ -1,3 +1,5 @@
+import pygame.sprite
+
 from settings import *
 
 class Bird(pygame.sprite.Sprite):
@@ -47,4 +49,24 @@ class Bird(pygame.sprite.Sprite):
         self.animate_state()
         self.apply_gravity()
         self.user_input()
+
+
+
+class Pipe(pygame.sprite.Sprite):
+    def __init__(self, type, height):
+        super().__init__()
+        pipe = pygame.image.load('assets/sprites/pipe-green.png').convert_alpha()
+
+        if type=='bottom':
+            self.image = pygame.transform.rotozoom(pipe,0, 2)
+            self.rect = self.image.get_rect(center=(300, height))
+        else:
+            self.image = pygame.transform.rotozoom(pipe, 180, 2)
+            self.image = pygame.transform.flip(self.image, True, False)
+            self.rect = self.image.get_rect(center=(300, height))
+
+
+
+
+
 
