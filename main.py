@@ -13,7 +13,8 @@ class Main:
         pygame.init()
 
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
+        # active state
+        self.game_state = 1
         # importing background for day and night
         background_day = pygame.image.load('assets/sprites/background-day.png').convert()
         background_night = pygame.image.load('assets/sprites/background-night.png').convert()
@@ -68,7 +69,10 @@ class Main:
         self.screen.blit(score_message, score_message_rect)
         # border
 
-
+    def collision(self):
+        if pygame.sprite.spritecollide(self.player.sprite, self.obstacles, False):
+            # game over state
+            self.game_state = 2
 
     def run(self):
         """
@@ -76,8 +80,7 @@ class Main:
         """
         while(True):
 
-            # set the background
-            self.screen.blit(self.background, (0, 0))
+
 
 
 
@@ -91,6 +94,10 @@ class Main:
                     self.obstacles.add(Pipe('bottom', bottom_center_position))
                     top_center_position = bottom_center_position - 800
                     self.obstacles.add(Pipe('top', top_center_position))
+
+            # set the background
+
+            self.screen.blit(self.background, (0, 0))
 
             self.obstacles.draw(self.screen)
             self.obstacles.update()
@@ -107,8 +114,12 @@ class Main:
             self.ground_rect.x -= 2
             self.ground_repeat_rect.x -= 2
 
+            # check collision
+            self.collision()
+
             # score points
-            self.player.sprite.score_point(self.obstacles)
+            if self.game_state == 1:
+                self.player.sprite.score_point(self.obstacles)
 
             # render score
             self.render_score()
