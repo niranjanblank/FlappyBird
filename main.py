@@ -22,6 +22,9 @@ class Main:
         # scaling the background to the size of window
         self.background = pygame.transform.smoothscale(self.background_frames[self.background_index], (WIDTH,HEIGHT))
 
+        # text
+        self.font = pygame.font.Font('assets/fonts/flappy-font.ttf',80)
+
         #ground
         ground = pygame.image.load('assets/sprites/base.png').convert()
 
@@ -46,9 +49,26 @@ class Main:
 
         self.clock = pygame.time.Clock()
 
+
+
         # timer for obstacle
         self.obstacle_timer = pygame.USEREVENT + 1
         pygame.time.set_timer(self.obstacle_timer, 2500)
+
+
+    def render_score(self):
+        font = pygame.font.Font('assets/fonts/flappy-font.ttf', 80)
+        font_2 =  pygame.font.Font('assets/fonts/flappy-font.ttf', 90)
+        score_message_border = font_2.render(f'{self.player.sprite.score}', False, 'black')
+        score_message_border_rect = score_message_border.get_rect(center=(WIDTH // 2, 100))
+
+        self.screen.blit(score_message_border, score_message_border_rect)
+        score_message = font.render(f'{self.player.sprite.score}', False, 'white')
+        score_message_rect = score_message.get_rect(center=(WIDTH // 2, 100))
+        self.screen.blit(score_message, score_message_rect)
+        # border
+
+
 
     def run(self):
         """
@@ -72,9 +92,6 @@ class Main:
                     top_center_position = bottom_center_position - 800
                     self.obstacles.add(Pipe('top', top_center_position))
 
-
-
-
             self.obstacles.draw(self.screen)
             self.obstacles.update()
 
@@ -90,7 +107,11 @@ class Main:
             self.ground_rect.x -= 2
             self.ground_repeat_rect.x -= 2
 
+            # score points
+            self.player.sprite.score_point(self.obstacles)
 
+            # render score
+            self.render_score()
 
             # display the player/bird
             self.player.draw(self.screen)

@@ -13,6 +13,7 @@ class Bird(pygame.sprite.Sprite):
         self.image = self.bird_frames[self.bird_frame_index]
         self.rect = self.image.get_rect(midbottom=(WIDTH//2-40, HEIGHT//2))
         self.gravity = 0
+        self.score = 0
     def animate_state(self):
         if self.rect.bottom >= GROUND_POSITION_Y:
             self.image = self.bird_frames[0]
@@ -44,7 +45,16 @@ class Bird(pygame.sprite.Sprite):
     def user_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
-            self.gravity = -15
+            self.gravity = -10
+
+    def score_point(self, obstacles):
+        for obstacle in obstacles:
+            if not obstacle.scored and obstacle.type == 'bottom':
+                if self.rect.left >= obstacle.rect.right:
+                    self.score += 1
+                    obstacle.scored = True
+
+
     def update(self):
         self.animate_state()
         self.apply_gravity()
@@ -52,12 +62,14 @@ class Bird(pygame.sprite.Sprite):
 
 
 
+
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, type, height):
         super().__init__()
         pipe = pygame.image.load('assets/sprites/pipe-green.png').convert_alpha()
-
-        if type=='bottom':
+        self.type = type
+        self.scored = False
+        if self.type == 'bottom':
             self.image = pygame.transform.rotozoom(pipe,0, 2)
             self.rect = self.image.get_rect(center=(WIDTH+100, height))
         else:
