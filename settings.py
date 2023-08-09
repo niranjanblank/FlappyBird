@@ -4,3 +4,6 @@ import pygame
 WIDTH = 520
 HEIGHT = 700
 
+#GROUND
+GROUND_POSITION_Y = 600
+

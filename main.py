@@ -51,7 +51,7 @@ class Main:
             self.screen.blit(self.background,(0,0))
 
             # set the ground
-            self.screen.blit(self.ground,(0,600))
+            self.screen.blit(self.ground,(0,GROUND_POSITION_Y))
             # display the player/bird
             self.player.draw(self.screen)
             self.player.update()
