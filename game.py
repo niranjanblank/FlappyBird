@@ -44,7 +44,9 @@ class Bird(pygame.sprite.Sprite):
 
     def user_input(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
+        # Check the state of the mouse buttons
+        left_button, middle_button, right_button = pygame.mouse.get_pressed()
+        if keys[pygame.K_SPACE] or left_button:
             self.gravity = -BIRD_JUMP_GRAVITY
 
     def score_point(self, obstacles):

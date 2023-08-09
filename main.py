@@ -14,7 +14,7 @@ class Main:
 
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         # active state
-        self.game_state = 1
+        self.game_state = 0
         # importing background for day and night
         background_day = pygame.image.load('assets/sprites/background-day.png').convert()
         background_night = pygame.image.load('assets/sprites/background-night.png').convert()
@@ -85,7 +85,11 @@ class Main:
                     exit()
 
                 # spawn obstacle
-                if self.game_state == 1:
+                if self.game_state == 0:
+                    if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or \
+                            (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+                        self.game_state = 1
+                elif self.game_state == 1:
                     if event.type == self.obstacle_timer:
                         bottom_center_position = randint(500, HEIGHT)
                         self.obstacles.add(Pipe('bottom', bottom_center_position))
@@ -108,9 +112,19 @@ class Main:
             self.screen.blit(self.ground, self.ground_rect)
             self.screen.blit(self.ground_repeat, self.ground_repeat_rect)
 
+            if self.game_state == 0:
 
+
+                initial_screen = pygame.image.load('assets/sprites/message.png').convert_alpha()
+                initial_screen = pygame.transform.smoothscale(initial_screen, (WIDTH-200, HEIGHT-200))
+                initial_screen_rect = initial_screen.get_rect(center=(WIDTH // 2, HEIGHT // 2 ))
+                self.screen.blit(initial_screen, initial_screen_rect)
+                font = pygame.font.Font('assets/fonts/flappy-font.ttf', 30)
+                # restart_message = font.render('Press space to start the game', False, 'black')
+                # restart_rect = restart_message.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+                # self.screen.blit(restart_message, restart_rect)
             # update logics when game state is active
-            if self.game_state == 1:
+            elif self.game_state == 1:
 
                 self.obstacles.update()
 
