@@ -9,12 +9,26 @@ class Bird(pygame.sprite.Sprite):
         self.bird_frames = [bird_1, bird_2, bird_3]
         self.bird_frame_index = 0
         self.image = self.bird_frames[self.bird_frame_index]
-        self.rect = self.image.get_rect(midbottom=(WIDTH//2, HEIGHT//2))
+        self.rect = self.image.get_rect(midbottom=(WIDTH//2-40, HEIGHT//2))
         self.gravity = 0
     def animate_state(self):
-        self.bird_frame_index += 0.1
-        if self.bird_frame_index >= len(self.bird_frames): self.bird_frame_index = 0
-        self.image = self.bird_frames[int(self.bird_frame_index)]
+        if self.rect.bottom >= GROUND_POSITION_Y:
+            self.image = self.bird_frames[0]
+            self.image = pygame.transform.rotate(self.image, -45)
+        else:
+            self.bird_frame_index += 0.1
+            if self.bird_frame_index >= len(self.bird_frames): self.bird_frame_index = 0
+
+
+            self.image = self.bird_frames[int(self.bird_frame_index)]
+
+            if self.gravity < 0:
+                self.image = pygame.transform.rotate(self.image , 15)
+            elif self.gravity >5 and self.gravity<15:
+                self.image = pygame.transform.rotate(self.image, -15)
+            elif self.gravity>=15 and self.gravity<=30:
+                self.image = pygame.transform.rotate(self.image, -45)
+
 
     def apply_gravity(self):
         self.gravity += 1
