@@ -20,6 +20,9 @@ class Main:
         # scaling the background to the size of window
         self.background = pygame.transform.smoothscale(self.background_frames[self.background_index], (WIDTH,HEIGHT))
 
+        #ground
+        ground = pygame.image.load('assets/sprites/base.png').convert()
+        self.ground = pygame.transform.smoothscale(ground, (WIDTH,ground.get_height()))
         # title of game
         pygame.display.set_caption("Flappy Bird")
         # icon for game
@@ -47,6 +50,8 @@ class Main:
             # set the background
             self.screen.blit(self.background,(0,0))
 
+            # set the ground
+            self.screen.blit(self.ground,(0,600))
             # display the player/bird
             self.player.draw(self.screen)
             self.player.update()
