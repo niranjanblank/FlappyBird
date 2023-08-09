@@ -1,7 +1,7 @@
 import pygame.display
 from sys import exit
 from settings import *
-
+from game import *
 class Main:
     """
     This class will be used to run the event loop
@@ -27,6 +27,11 @@ class Main:
         pygame.display.set_icon(icon)
         # screen to render the game
 
+        #bird
+        self.player = pygame.sprite.GroupSingle()
+        self.player.add(Bird())
+
+
         self.clock = pygame.time.Clock()
 
     def run(self):
@@ -42,6 +47,9 @@ class Main:
             # set the background
             self.screen.blit(self.background,(0,0))
 
+            # display the player/bird
+            self.player.draw(self.screen)
+            self.player.update()
 
             #update the screen
             pygame.display.update()
