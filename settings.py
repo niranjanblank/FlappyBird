@@ -1,6 +1,6 @@
 import pygame
 
 # GAME DIMENSIONS
-WIDTH = 768
-HEIGHT = 1024
+WIDTH = 520
+HEIGHT = 700
 
