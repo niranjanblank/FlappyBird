@@ -45,7 +45,7 @@ class Bird(pygame.sprite.Sprite):
     def user_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
-            self.gravity = -10
+            self.gravity = -BIRD_JUMP_GRAVITY
 
     def score_point(self, obstacles):
         for obstacle in obstacles:
@@ -54,6 +54,9 @@ class Bird(pygame.sprite.Sprite):
                     self.score += 1
                     obstacle.scored = True
 
+    def reset(self):
+        self.rect.center = (WIDTH//2-40, HEIGHT//2)
+        self.score = 0
 
     def update(self):
         self.animate_state()
@@ -80,6 +83,7 @@ class Pipe(pygame.sprite.Sprite):
     def destroy(self):
         if self.rect.x <= -100:
             self.kill()
+
 
     def update(self):
         self.rect.x -= 2

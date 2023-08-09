@@ -57,20 +57,20 @@ class Main:
         pygame.time.set_timer(self.obstacle_timer, 2500)
 
 
-    def render_score(self):
+    def render_score(self, pos):
         font = pygame.font.Font('assets/fonts/flappy-font.ttf', 80)
         font_2 =  pygame.font.Font('assets/fonts/flappy-font.ttf', 90)
         score_message_border = font_2.render(f'{self.player.sprite.score}', False, 'black')
-        score_message_border_rect = score_message_border.get_rect(center=(WIDTH // 2, 100))
+        score_message_border_rect = score_message_border.get_rect(center=pos)
 
         self.screen.blit(score_message_border, score_message_border_rect)
         score_message = font.render(f'{self.player.sprite.score}', False, 'white')
-        score_message_rect = score_message.get_rect(center=(WIDTH // 2, 100))
+        score_message_rect = score_message.get_rect(center=pos)
         self.screen.blit(score_message, score_message_rect)
         # border
 
     def collision(self):
-        if pygame.sprite.spritecollide(self.player.sprite, self.obstacles, False):
+        if pygame.sprite.spritecollide(self.player.sprite, self.obstacles, False) or self.player.sprite.rect.bottom >= GROUND_POSITION_Y:
             # game over state
             self.game_state = 2
 
@@ -80,53 +80,76 @@ class Main:
         """
         while(True):
 
-
-
-
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit()
 
                 # spawn obstacle
-                if event.type == self.obstacle_timer:
-                    bottom_center_position = randint(500, HEIGHT)
-                    self.obstacles.add(Pipe('bottom', bottom_center_position))
-                    top_center_position = bottom_center_position - 800
-                    self.obstacles.add(Pipe('top', top_center_position))
+                if self.game_state == 1:
+                    if event.type == self.obstacle_timer:
+                        bottom_center_position = randint(500, HEIGHT)
+                        self.obstacles.add(Pipe('bottom', bottom_center_position))
+                        top_center_position = bottom_center_position - 800
+                        self.obstacles.add(Pipe('top', top_center_position))
+                else:
+                    if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                        self.game_state = 1
+                        self.obstacles.empty()
+                        self.player.sprite.reset()
 
             # set the background
 
             self.screen.blit(self.background, (0, 0))
 
+            # render the obstacles
             self.obstacles.draw(self.screen)
-            self.obstacles.update()
 
-            # checking if the ground went out of screen and re-rendering based on it
-            if self.ground_rect.right<2:
-                self.ground_rect.left = WIDTH
-            if self.ground_repeat_rect.right <2:
-                self.ground_repeat_rect.left = WIDTH
             # set the ground
             self.screen.blit(self.ground, self.ground_rect)
             self.screen.blit(self.ground_repeat, self.ground_repeat_rect)
 
-            self.ground_rect.x -= 2
-            self.ground_repeat_rect.x -= 2
 
-            # check collision
-            self.collision()
-
-            # score points
+            # update logics when game state is active
             if self.game_state == 1:
-                self.player.sprite.score_point(self.obstacles)
 
-            # render score
-            self.render_score()
+                self.obstacles.update()
 
-            # display the player/bird
-            self.player.draw(self.screen)
-            self.player.update()
+                # checking if the ground went out of screen and re-rendering based on it
+                if self.ground_rect.right<2:
+                    self.ground_rect.left = WIDTH
+                if self.ground_repeat_rect.right <2:
+                    self.ground_repeat_rect.left = WIDTH
+
+
+                self.ground_rect.x -= 2
+                self.ground_repeat_rect.x -= 2
+
+                # check collision
+                self.collision()
+
+                # score points
+                if self.game_state == 1:
+                    self.player.sprite.score_point(self.obstacles)
+
+                # render score
+                self.render_score((WIDTH // 2, 100))
+
+                # render the player/bird
+                self.player.draw(self.screen)
+                # update the player
+                self.player.update()
+            else:
+                # render the player/bird
+                self.player.draw(self.screen)
+                self.render_score((WIDTH // 2, HEIGHT // 2 - 100))
+                game_over = pygame.transform.rotozoom(pygame.image.load('assets/sprites/gameover.png').convert_alpha(),0,2)
+                game_over_rect = game_over.get_rect(center=((WIDTH // 2, HEIGHT // 2)))
+                self.screen.blit(game_over, game_over_rect)
+                font = pygame.font.Font('assets/fonts/flappy-font.ttf',30)
+                restart_message = font.render('Press space to restart',False, 'black')
+                restart_rect = restart_message.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
+                self.screen.blit(restart_message, restart_rect)
+
 
             #update the screen
             pygame.display.update()
