@@ -8,6 +8,9 @@ class Bird(pygame.sprite.Sprite):
         bird_1 = pygame.transform.rotozoom(pygame.image.load('assets/sprites/yellowbird-midflap.png').convert_alpha(), 0, 1.5)
         bird_2 = pygame.transform.rotozoom(pygame.image.load('assets/sprites/yellowbird-upflap.png').convert_alpha(), 0, 1.5)
         bird_3 = pygame.transform.rotozoom(pygame.image.load('assets/sprites/yellowbird-downflap.png').convert_alpha(), 0, 1.5)
+
+        self.score_sound = pygame.mixer.Sound('assets/audio/point.wav')
+        self.score_sound.set_volume(0.3)
         self.bird_frames = [bird_1, bird_2, bird_3]
         self.bird_frame_index = 0
         self.image = self.bird_frames[self.bird_frame_index]
@@ -49,12 +52,14 @@ class Bird(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] or left_button:
             self.gravity = -BIRD_JUMP_GRAVITY
 
+
     def score_point(self, obstacles):
         for obstacle in obstacles:
             if not obstacle.scored and obstacle.type == 'bottom':
                 if self.rect.left >= obstacle.rect.right:
                     self.score += 1
                     obstacle.scored = True
+                    self.score_sound.play()
 
     def reset(self):
         self.rect.center = (WIDTH//2-40, HEIGHT//2)
