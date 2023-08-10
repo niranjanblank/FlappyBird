@@ -45,6 +45,9 @@ class Bird(pygame.sprite.Sprite):
         if self.rect.bottom >= GROUND_POSITION_Y:
             self.rect.bottom = GROUND_POSITION_Y
 
+        if self.rect.top <= -50:
+            self.rect.top = -50
+
     def user_input(self):
         keys = pygame.key.get_pressed()
         # Check the state of the mouse buttons
