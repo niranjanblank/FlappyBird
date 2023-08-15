@@ -74,6 +74,72 @@ class Main:
             # game over state
             self.game_state = 2
 
+    def step(self):
+        """
+        Render single frame
+        """
+        # set the background
+
+        self.screen.blit(self.background, (0, 0))
+
+        # render the obstacles
+        self.obstacles.draw(self.screen)
+
+        # set the ground
+        self.screen.blit(self.ground, self.ground_rect)
+        self.screen.blit(self.ground_repeat, self.ground_repeat_rect)
+
+        if self.game_state == 0:
+
+            initial_screen = pygame.image.load('assets/sprites/message.png').convert_alpha()
+            initial_screen = pygame.transform.smoothscale(initial_screen, (WIDTH - 200, HEIGHT - 200))
+            initial_screen_rect = initial_screen.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+            self.screen.blit(initial_screen, initial_screen_rect)
+            font = pygame.font.Font('assets/fonts/flappy-font.ttf', 30)
+            # restart_message = font.render('Press space to start the game', False, 'black')
+            # restart_rect = restart_message.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+            # self.screen.blit(restart_message, restart_rect)
+        # update logics when game state is active
+        elif self.game_state == 1:
+
+            self.obstacles.update()
+
+            # checking if the ground went out of screen and re-rendering based on it
+            if self.ground_rect.right < 2:
+                self.ground_rect.left = WIDTH
+            if self.ground_repeat_rect.right < 2:
+                self.ground_repeat_rect.left = WIDTH
+
+            self.ground_rect.x -= 2
+            self.ground_repeat_rect.x -= 2
+
+            # check collision
+            self.collision()
+
+            # score points
+            if self.game_state == 1:
+                self.player.sprite.score_point(self.obstacles)
+
+            # render score
+            self.render_score((WIDTH // 2, 100))
+
+            # render the player/bird
+            self.player.draw(self.screen)
+            # update the player
+            self.player.update()
+        else:
+            # render the player/bird
+            self.player.draw(self.screen)
+            self.render_score((WIDTH // 2, HEIGHT // 2 - 100))
+            game_over = pygame.transform.rotozoom(pygame.image.load('assets/sprites/gameover.png').convert_alpha(), 0,
+                                                  2)
+            game_over_rect = game_over.get_rect(center=((WIDTH // 2, HEIGHT // 2)))
+            self.screen.blit(game_over, game_over_rect)
+            font = pygame.font.Font('assets/fonts/flappy-font.ttf', 30)
+            restart_message = font.render('Press space to restart', False, 'black')
+            restart_rect = restart_message.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
+            self.screen.blit(restart_message, restart_rect)
+
     def run(self):
         """
         Event loop will be initiated here
@@ -101,69 +167,8 @@ class Main:
                         self.obstacles.empty()
                         self.player.sprite.reset()
 
-            # set the background
 
-            self.screen.blit(self.background, (0, 0))
-
-            # render the obstacles
-            self.obstacles.draw(self.screen)
-
-            # set the ground
-            self.screen.blit(self.ground, self.ground_rect)
-            self.screen.blit(self.ground_repeat, self.ground_repeat_rect)
-
-            if self.game_state == 0:
-
-
-                initial_screen = pygame.image.load('assets/sprites/message.png').convert_alpha()
-                initial_screen = pygame.transform.smoothscale(initial_screen, (WIDTH-200, HEIGHT-200))
-                initial_screen_rect = initial_screen.get_rect(center=(WIDTH // 2, HEIGHT // 2 ))
-                self.screen.blit(initial_screen, initial_screen_rect)
-                font = pygame.font.Font('assets/fonts/flappy-font.ttf', 30)
-                # restart_message = font.render('Press space to start the game', False, 'black')
-                # restart_rect = restart_message.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
-                # self.screen.blit(restart_message, restart_rect)
-            # update logics when game state is active
-            elif self.game_state == 1:
-
-                self.obstacles.update()
-
-                # checking if the ground went out of screen and re-rendering based on it
-                if self.ground_rect.right<2:
-                    self.ground_rect.left = WIDTH
-                if self.ground_repeat_rect.right <2:
-                    self.ground_repeat_rect.left = WIDTH
-
-
-                self.ground_rect.x -= 2
-                self.ground_repeat_rect.x -= 2
-
-                # check collision
-                self.collision()
-
-                # score points
-                if self.game_state == 1:
-                    self.player.sprite.score_point(self.obstacles)
-
-                # render score
-                self.render_score((WIDTH // 2, 100))
-
-                # render the player/bird
-                self.player.draw(self.screen)
-                # update the player
-                self.player.update()
-            else:
-                # render the player/bird
-                self.player.draw(self.screen)
-                self.render_score((WIDTH // 2, HEIGHT // 2 - 100))
-                game_over = pygame.transform.rotozoom(pygame.image.load('assets/sprites/gameover.png').convert_alpha(),0,2)
-                game_over_rect = game_over.get_rect(center=((WIDTH // 2, HEIGHT // 2)))
-                self.screen.blit(game_over, game_over_rect)
-                font = pygame.font.Font('assets/fonts/flappy-font.ttf',30)
-                restart_message = font.render('Press space to restart',False, 'black')
-                restart_rect = restart_message.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
-                self.screen.blit(restart_message, restart_rect)
-
+            self.step()
 
             #update the screen
             pygame.display.update()
