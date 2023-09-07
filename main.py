@@ -167,9 +167,11 @@ class Main:
                     # checking button collision
                     if self.human_button.rect.collidepoint(mouse_pos):
                         self.player_type = 'player'
+                        self.game_state = 1
                     if self.ai_button.rect.collidepoint(mouse_pos):
                         self.player_type = 'ai'
-                    self.game_state = 1
+                        self.game_state = 1
+
 
             elif self.game_state == 1:
                 if event.type == self.obstacle_timer:
