@@ -101,7 +101,13 @@ class Main:
             initial_screen = pygame.image.load('assets/sprites/message_2.png').convert_alpha()
             initial_screen = pygame.transform.smoothscale(initial_screen, (WIDTH - 200, HEIGHT - 200))
             initial_screen_rect = initial_screen.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+
+            human_button = Button(type='player',pos=(WIDTH//2, HEIGHT//2 + 200))
+            ai_button = Button(type='ai',pos=(WIDTH//2, human_button.rect[1]+100))
+
             self.screen.blit(initial_screen, initial_screen_rect)
+            self.screen.blit(human_button.image, human_button.rect)
+            self.screen.blit(ai_button.image, ai_button.rect)
             font = pygame.font.Font('assets/fonts/flappy-font.ttf', 30)
             # restart_message = font.render('Press space to start the game', False, 'black')
             # restart_rect = restart_message.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))

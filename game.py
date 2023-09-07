@@ -101,5 +101,13 @@ class Pipe(pygame.sprite.Sprite):
 
 
 
-
+class Button(pygame.sprite.Sprite):
+    def __init__(self, type, pos):
+        super().__init__()
+        if type=='player':
+            button_image = pygame.image.load('assets/sprites/human_play.png').convert_alpha()
+        else:
+            button_image = pygame.image.load('assets/sprites/ai_play.png').convert_alpha()
+        self.image = pygame.transform.rotozoom(button_image, 0, 2)
+        self.rect = self.image.get_rect(center=pos)
 
