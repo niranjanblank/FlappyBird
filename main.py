@@ -13,6 +13,9 @@ class Main:
 
         pygame.init()
 
+        #player type either ai or player
+        self.player_type = 'player'
+
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         # active state
         self.game_state = 0
@@ -95,7 +98,7 @@ class Main:
 
         if self.game_state == 0:
 
-            initial_screen = pygame.image.load('assets/sprites/message.png').convert_alpha()
+            initial_screen = pygame.image.load('assets/sprites/message_2.png').convert_alpha()
             initial_screen = pygame.transform.smoothscale(initial_screen, (WIDTH - 200, HEIGHT - 200))
             initial_screen_rect = initial_screen.get_rect(center=(WIDTH // 2, HEIGHT // 2))
             self.screen.blit(initial_screen, initial_screen_rect)
@@ -153,6 +156,7 @@ class Main:
             if self.game_state == 0:
                 if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or \
                         (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+                    self.player_type = 'ai'
                     self.game_state = 1
             elif self.game_state == 1:
                 if event.type == self.obstacle_timer:
@@ -162,36 +166,22 @@ class Main:
                     self.obstacles.add(Pipe('top', top_center_position))
             else:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    # setting the player type
+                    self.player_type = 'ai'
                     self.game_state = 1
                     self.obstacles.empty()
                     self.player.sprite.reset()
 
     def run(self):
+
         """
         Event loop will be initiated here
         """
+        # loading the best model and setting the nerural net
+        genome, config = self.load_saved_model('best_ai.pkl')
+        net = neat.nn.FeedForwardNetwork.create(genome, config)
         while(True):
 
-            # for event in pygame.event.get():
-            #     if event.type == pygame.QUIT:
-            #         exit()
-            #
-            #     # spawn obstacle
-            #     if self.game_state == 0:
-            #         if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or \
-            #                 (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
-            #             self.game_state = 1
-            #     elif self.game_state == 1:
-            #         if event.type == self.obstacle_timer:
-            #             bottom_center_position = randint(500, HEIGHT)
-            #             self.obstacles.add(Pipe('bottom', bottom_center_position))
-            #             top_center_position = bottom_center_position - 800
-            #             self.obstacles.add(Pipe('top', top_center_position))
-            #     else:
-            #         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-            #             self.game_state = 1
-            #             self.obstacles.empty()
-            #             self.player.sprite.reset()
             self.get_events()
 
             self.step()
@@ -199,6 +189,19 @@ class Main:
             #update the screen
             pygame.display.update()
             self.clock.tick(60)
+
+            if self.player_type == 'ai':
+                # Get the game states and use the neural network to decide the action
+                game_states = self.get_game_states()
+                # print(game_states)
+                output = net.activate(game_states)
+
+
+                # Decide action based on the output of the neural network
+                # This part will depend on how you've structured the output of your network
+
+                action = self.neat_decide_action_based_on_output(output)
+                self.neat_perform_action(action)
 
 
     # methods for training neaat algorithm
@@ -325,7 +328,17 @@ class Main:
         with open('best_ai.pkl', 'wb') as output:
             pickle.dump(winner, output, 1)
 
+    def load_saved_model(self,model_name):
+        "load the saved model"
+        with open(model_name, 'rb') as input_file:
+            genome = pickle.load(input_file)
+        # neat config
+        config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                             neat.DefaultSpeciesSet, neat.DefaultStagnation,
+                             'config-feedforward.txt')
+        return genome, config
 
 if __name__ =="__main__":
     main = Main()
-    main.train_ai()
+    # main.train_ai()
+    main.run()
