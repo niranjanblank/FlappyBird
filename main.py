@@ -55,6 +55,11 @@ class Main:
         # obstacles
         self.obstacles = pygame.sprite.Group()
 
+
+        # buttons
+        self.human_button = Button(type='player', pos=(WIDTH // 2, HEIGHT // 2 + 200))
+        self.ai_button = Button(type='ai', pos=(WIDTH // 2, self.human_button.rect[1] + 100))
+
         self.clock = pygame.time.Clock()
 
 
@@ -102,16 +107,13 @@ class Main:
             initial_screen = pygame.transform.smoothscale(initial_screen, (WIDTH - 200, HEIGHT - 200))
             initial_screen_rect = initial_screen.get_rect(center=(WIDTH // 2, HEIGHT // 2))
 
-            human_button = Button(type='player',pos=(WIDTH//2, HEIGHT//2 + 200))
-            ai_button = Button(type='ai',pos=(WIDTH//2, human_button.rect[1]+100))
 
+            # displaying buttons
             self.screen.blit(initial_screen, initial_screen_rect)
-            self.screen.blit(human_button.image, human_button.rect)
-            self.screen.blit(ai_button.image, ai_button.rect)
-            font = pygame.font.Font('assets/fonts/flappy-font.ttf', 30)
-            # restart_message = font.render('Press space to start the game', False, 'black')
-            # restart_rect = restart_message.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
-            # self.screen.blit(restart_message, restart_rect)
+            self.screen.blit(self.human_button.image, self.human_button.rect)
+            self.screen.blit(self.ai_button.image, self.ai_button.rect)
+
+
         # update logics when game state is active
         elif self.game_state == 1:
 
@@ -149,10 +151,9 @@ class Main:
             game_over_rect = game_over.get_rect(center=((WIDTH // 2, HEIGHT // 2)))
             self.screen.blit(game_over, game_over_rect)
             font = pygame.font.Font('assets/fonts/flappy-font.ttf', 30)
-            restart_message = font.render('Press space to restart', False, 'black')
+            restart_message = font.render('Press space or click to restart', False, 'black')
             restart_rect = restart_message.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
-            self.screen.blit(restart_message, restart_rect)
-
+            self.screen.blit(restart_message,restart_rect)
     def get_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -160,10 +161,16 @@ class Main:
 
             # spawn obstacle
             if self.game_state == 0:
-                if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or \
-                        (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
-                    self.player_type = 'ai'
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # get mouse position
+                    mouse_pos = pygame.mouse.get_pos()
+                    # checking button collision
+                    if self.human_button.rect.collidepoint(mouse_pos):
+                        self.player_type = 'player'
+                    if self.ai_button.rect.collidepoint(mouse_pos):
+                        self.player_type = 'ai'
                     self.game_state = 1
+
             elif self.game_state == 1:
                 if event.type == self.obstacle_timer:
                     bottom_center_position = randint(500, HEIGHT)
@@ -171,10 +178,10 @@ class Main:
                     top_center_position = bottom_center_position - 800
                     self.obstacles.add(Pipe('top', top_center_position))
             else:
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                if (event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE) or event.type == pygame.MOUSEBUTTONDOWN:
                     # setting the player type
-                    self.player_type = 'ai'
-                    self.game_state = 1
+                    self.player_type = 'player'
+                    self.game_state = 0
                     self.obstacles.empty()
                     self.player.sprite.reset()
 
